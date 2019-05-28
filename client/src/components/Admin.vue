@@ -5,7 +5,7 @@
   <h1>Admin Dashboard</h1>
   <router-link v-bind:to="{ name: 'Manage', params: { view: true } }"><button class="admin-button">Manage Data</button></router-link>
   <router-link to="/display"><button class="admin-button">Current/Previous Sale Display</button></router-link>
-  <router-link to="/exhibitor"><button class="admin-button">List of Exhibitors</button></router-link>
+  <router-link to="/exhibitor/history"><button class="admin-button">Exhibitor History Display</button></router-link>
   <router-link to="/buyer"><button class="admin-button">Buyer/Addons Display</button></router-link>
   <router-link to="/transaction/buyer"><button class="admin-button">Buyer Transaction Table</button></router-link>
   <router-link to="/transaction/addon"><button class="admin-button">Addon Transaction Table</button></router-link>
