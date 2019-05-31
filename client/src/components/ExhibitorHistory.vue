@@ -3,21 +3,23 @@
       <h1 class="history_display_header">Exhibitor History</h1>
       <table class ="exhibitor_history_table">
         <thead>
-          <tr class="table_headers">
-            <th>Exhibitor Name</th>
-            <th>Buyers</th>
-            <th>Addons</th>
+          <tr>
+            <th class="table_c1">Sale #</th>
+            <th class="table_c2">Exhibitor Name</th>
+            <th class="table_c3">Buyers</th>
+            <th class="table_c4">Addons</th>
           </tr>
         </thead>
         <tbody>
           <tr class="exhibitor_table_rows">
+            <td class="sale_number">{{this.saleNumber}}</td>
             <td>{{exhibitor.fullName}}</td>
 
             <!-- Buyers -->
             <td>
               <table>
                 <tbody>
-                  <tr v-if="buyer !== null" v-for="buyer in buyers" :key="buyer._id">
+                  <tr class="buyer_rows" v-if="buyer !== null" v-for="buyer in buyers" :key="buyer._id">
                     <td>{{ buyer.name }}</td>
                   </tr>
                 </tbody>
@@ -28,16 +30,20 @@
             <td>
               <table>
                 <tbody>
-                <section v-if="(transaction.purchaseType === addon) && transactions.length" v-for="transaction in transactions" :key="transaction._id">
-                  <tr v-if="addOn.bidderNumber == transaction.bidderNumber" v-for="addOn in addOns" :key="addOn._id">
-                    <td class="addonRow">{{ addOn.name }}</td>
-                    <td class="addonRow">${{ transaction.purchaseAmount }}</td>
+                  <tr class="addon_rows" v-for="addOn in addOns" :key="addOn._id">
+                    <td>{{ addOn.name }}</td>
+                    <td>{{ addOn.purchaseAmount }}</td>
                   </tr>
-                </section>
                 </tbody>
               </table>
             </td>
 
+          </tr>
+
+          <tr class ="table_tail">
+            <td></td>
+            <td></td>
+            <td>Purchase Amount: ${{transactions[0].purchaseAmount}}</td>
           </tr>
         </tbody>
       </table>
@@ -49,112 +55,61 @@
   export default {
     data() {
       return {
+        exhibitorDisplaySpeed: 5000, // milliseconds
         saleNumber: 0,
+        maxSaleNumber: 0,
         exhibitor: [],
-        previousExhibitor: [],
         buyers: [],
-        addOns: [],
         transactions: [],
-        previousSaleNumber: 0,
-        displayID: 0,
-        bidderNumbers: 0,
-        showCurrentSale: false,
-        showPreviousSale: false,
-        buyer: "Buyer",
-        addon: "Addon"
+        bidderNumbers: 0
       }
+    },
+    created: function() {
+      setInterval(() => this.fetchSaleNumber(), this.exhibitorDisplaySpeed)
+      this.fetchSaleNumber()
     },
     computed: {
       ...mapState({
         // saleNumber: state => state.saleNumber,
         // transactions: state => state.transactions
-      })
-    },
-    created: function() {
-      setInterval(() => this.fetchSaleNumber(), 1000)
-      this.fetchSaleNumber()
+      }),
+      addOns: function() {
+        return this.transactions.filter(addon => addon.saleNumber == this.saleNumber)
+      }
     },
     methods: {
       async fetchSaleNumber() {
-        // retrieve data for comparison
         let uri = `http://${process.env.HOST_NAME}:8081/display`
-        await this.axios.get(uri).then(response => {
-          if (response.data.length >= 1) {
-            this.displayID = response.data[0]._id
-            this.saleNumber = response.data[0].saleNumber
-            this.showCurrentSale = response.data[0].showCurrentSale
-            this.showPreviousSale = response.data[0].showPreviousSale
-          }
-        })
-        // checks flag, retrieves new sale number, then reloads pages in the display functions
-        if (this.showCurrentSale === true) {
-          this.displayCurrentSale()
+        try {
+          await this.axios.get(uri).then(response => {
+            if (response.data.length >= 1) {
+              if (this.maxSaleNumber < response.data[0].saleNumber) this.maxSaleNumber = response.data[0].saleNumber // Updates max sale number to loop through.
+            }
+          })
+        } catch (err) {
+          console.log("Waiting for display entry")
+          // console.log(err)
         }
-        if (this.showPreviousSale === true) {
-          this.displayPreviousSale()
+        if (this.saleNumber < this.maxSaleNumber - 1) {
+          this.saleNumber++
+        } else if (this.maxSaleNumber != 0) {
+          this.saleNumber = 1
         }
-        this.fetchData()
+
+        if (this.maxSaleNumber > 0) this.fetchData()
       },
       async fetchData() {
-        // fetches all data
         this.fetchExhibitor()
-        this.fetchPreviousExhibitor()
         this.fetchBuyers()
         this.fetchTransactions()
         this.fetchAddOns()
-        // this.fetchAddOnBuyers()
-      },
-      async displayCurrentSale() {
-        let uri = `http://${process.env.HOST_NAME}:8081/display/${this.displayID}`
-        this.showCurrentSale = false
-        let state = {
-          saleNumber: this.saleNumber,
-          previousSaleNumber: this.previousSaleNumber,
-          showCurrentSale: this.showCurrentSale,
-          showPreviousSale: this.showPreviousSale
-        }
-        await this.axios.put(uri, state).then(response => {})
-      },
-      async displayPreviousSale() {
-        let uri = `http://${process.env.HOST_NAME}:8081/display/${this.displayID}`
-        this.showPreviousSale = false
-        let updatedCheck = {
-          saleNumber: this.saleNumber,
-          previousSaleNumber: this.previousSaleNumber,
-          showCurrentSale: this.showCurrentSale,
-          showPreviousSale: this.showPreviousSale
-        }
-        await this.axios.put(uri, updatedCheck).then(response => { })
-        window.location.reload()
+        console.log("data fetch call")
       },
       async fetchExhibitor() {
         // fetches the current exhibitor by its sale number
         let url = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${this.saleNumber}`
         await this.axios.get(url).then(response => {
           this.exhibitor = response.data
-        })
-      },
-      async fetchPreviousExhibitor() {
-        // gets the previous sale number from the most recent transaction
-        await this.axios.get(`http://${process.env.HOST_NAME}:8081/transaction`).then(response => {
-          let index = response.data.length - 1
-          while (response.data.length > 0) {
-            if (response.data[index].purchaseType === "Buyer") {
-              this.previousSaleNumber = response.data[index].saleNumber
-              break
-            } else index--
-          }
-        })
-        // fetches the previous exhibitor by the previous sale number
-        let url = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${this.previousSaleNumber}`
-        await this.axios.get(url).then(response => {
-          this.previousExhibitor = response.data
-        })
-      },
-      async fetchTransactions() {
-        let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.previousSaleNumber}`
-        await this.axios.get(url).then(response => {
-          this.transactions = response.data
         })
       },
       async fetchBuyers() {
@@ -167,18 +122,32 @@
         }
       },
       async parseBidderNumber() {
-        this.bidderNumbers = this.transactions[0].bidderNumber.split('-')
+        try {
+          this.bidderNumbers = this.transactions[0].bidderNumber.split('-')
+        } catch (err) {
+         console.log("Waiting for transaction update")
+        }
+      },
+      async fetchTransactions() {
+        let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber}`
+        try {
+          await this.axios.get(url).then(response => {
+            this.transactions = response.data
+          })
+        } catch (err) {
+          console.log("Waiting for transactions to occur")
+        }
       },
       async fetchAddOns() {
-        let uri = `http://${process.env.HOST_NAME}:8081/buyer`
-        await this.axios.get(uri).then(response => {
-          this.addOns = response.data
-        })
+
       },
       ...mapActions(['setSaleNumber', 'setTransactions'])
     }
   }
+
 </script>
+
+
 <css>
 .history_display_header {
   font-size: 50px;
@@ -195,18 +164,29 @@
   color: #404040;
   width: 99%; }
 
-.table_headers {
-  width: 30%;
+.table_c1 {
+  color: #339966;
+  font-size: 25px;
+  width: 5%; }
+
+.sale_number {
+  text-align: center; }
+
+.table_tail,
+.table_c2,
+.table_c3,
+.table_c4 {
+  width: 32%;
   color: #339966;
   font-size: 25px; }
 
 .exhibitor_table_rows {
-  font-size: 25px;
-  margin: 10px 10px;
-  padding: 5px 10px; }
+  font-size: 40px;  }
 
-.addonRow {
-  width: 50% }
+.buyer_rows {
+  font-size: 35px;  }
 
+.addon_rows {
+  font-size: 20px;  }
 
 </css>
