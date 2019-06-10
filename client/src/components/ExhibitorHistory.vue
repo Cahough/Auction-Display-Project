@@ -19,8 +19,8 @@
             <td>
               <table>
                 <tbody>
-                  <tr class="buyer_rows" v-if="buyer !== null" v-for="buyer in buyers" :key="buyer._id">
-                    <td>{{ buyer.name }}</td>
+                  <tr class="buyer_rows" v-for="b in buyerNumbers" :key="b">
+                    <td>{{ buyers[b-1].name }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -30,9 +30,9 @@
             <td>
               <table>
                 <tbody>
-                  <tr class="addon_rows" v-for="addOn in addOns" :key="addOn._id">
-                    <td>{{ addOn.name }}</td>
-                    <td>{{ addOn.purchaseAmount }}</td>
+                  <tr class="addon_rows" v-if="addon.purchaseType != buyer" v-for="addon in addons" :key="addon._id">
+                    <td>{{ addon.name }}</td>
+                    <td>{{ addon.purchaseAmount }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -43,7 +43,7 @@
           <tr class ="table_tail">
             <td></td>
             <td></td>
-            <td>Purchase Amount: ${{transactions[0].purchaseAmount}}</td>
+            <td v-if="transactions[0] != null">Purchase Amount: ${{transactions[0].purchaseAmount}}</td>
           </tr>
         </tbody>
       </table>
@@ -60,8 +60,10 @@
         maxSaleNumber: 0,
         exhibitor: [],
         buyers: [],
+        addons: [],
         transactions: [],
-        bidderNumbers: 0
+        buyerNumbers: [],
+        buyer: "Buyer"
       }
     },
     created: function() {
@@ -72,10 +74,13 @@
       ...mapState({
         // saleNumber: state => state.saleNumber,
         // transactions: state => state.transactions
-      }),
-      addOns: function() {
+      }) /* ,
+      currentTransactions: function() {
+        this.fetchAddons()
+        this.logArr()
+        console.log("Ctrans reached")
         return this.transactions.filter(addon => addon.saleNumber == this.saleNumber)
-      }
+      } */
     },
     methods: {
       async fetchSaleNumber() {
@@ -99,11 +104,14 @@
         if (this.maxSaleNumber > 0) this.fetchData()
       },
       async fetchData() {
+        this.fetchTransactions()
         this.fetchExhibitor()
         this.fetchBuyers()
-        this.fetchTransactions()
-        this.fetchAddOns()
-        console.log("data fetch call")
+        this.fetchBuyerNumbers()
+        this.fetchAddons()
+      },
+      async fetchBuyerNumbers() {
+        this.buyerNumbers = this.transactions[0].bidderNumber.split('-').map(Number)
       },
       async fetchExhibitor() {
         // fetches the current exhibitor by its sale number
@@ -113,20 +121,10 @@
         })
       },
       async fetchBuyers() {
-        this.parseBidderNumber()
-        for (let i = 0; i < this.bidderNumbers.length; i++) {
-          let uri = `http://${process.env.HOST_NAME}:8081/buyer/bidderNumber/${this.bidderNumbers[i]}`
-          await this.axios.get(uri).then(response => {
-            this.buyers[i] = response.data
-          })
-        }
-      },
-      async parseBidderNumber() {
-        try {
-          this.bidderNumbers = this.transactions[0].bidderNumber.split('-')
-        } catch (err) {
-         console.log("Waiting for transaction update")
-        }
+        let uri = `http://${process.env.HOST_NAME}:8081/buyer`
+        this.axios.get(uri).then(response => {
+          this.buyers = response.data
+        })
       },
       async fetchTransactions() {
         let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber}`
@@ -138,9 +136,18 @@
           console.log("Waiting for transactions to occur")
         }
       },
-      async fetchAddOns() {
-
-      },
+      async fetchAddons() {
+        this.addons = []
+        for (let i = 0; i < this.transactions.length; i++) {
+          if (this.transactions[i].purchaseType == "Addon") {
+            this.addons.push({
+            name: this.buyers[this.transactions[i].bidderNumber].name,
+            purchaseAmount: this.transactions[i].purchaseAmount
+            })
+          }
+        }
+        console.log(this.addons)
+    },
       ...mapActions(['setSaleNumber', 'setTransactions'])
     }
   }
