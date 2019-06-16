@@ -56,7 +56,7 @@
           <tr class ="table_tail">
             <td></td>
             <td></td>
-            <td v-if="transactions[0] != null">Purchase Amount: ${{transactions[0].purchaseAmount}}</td>
+            <td v-if="transactions[0] != null && t.purchaseType == buyer" v-for="t in transactions" :key="t._id">Purchase Amount: ${{t.purchaseAmount}}</td>
           </tr>
         </tbody>
       </table>
@@ -117,7 +117,7 @@
           <tr class ="table_tail">
             <td></td>
             <td></td>
-            <td v-if="transactions2[0] != null">Purchase Amount: ${{transactions2[0].purchaseAmount}}</td>
+            <td v-if="t.purchaseType == buyer" v-for="t in transactions2" :key="t._id">Purchase Amount: ${{t.purchaseAmount}}</td>
           </tr>
         </tbody>
       </table>
@@ -243,7 +243,7 @@
         this.addons = []
         this.addons2 = []
         await this.sortBuyers()
-        
+
         let col = 1
         for (let i = 0; i < this.transactions.length; i++) {
           if (this.transactions[i].purchaseType == "Addon") {
