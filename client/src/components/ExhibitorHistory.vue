@@ -1,6 +1,7 @@
 <template>
     <main class="exhibitorHistory">
       <h1 class="history_display_header">Exhibitor History</h1>
+      <div class="table_view">
       <table class ="exhibitor_history_table">
         <thead>
           <tr>
@@ -8,12 +9,13 @@
             <th class="table_c2">Exhibitor Name</th>
             <th class="table_c3">Buyers</th>
             <th class="table_c4">Addons</th>
+            <th class="table_c4">Addons</th>
           </tr>
         </thead>
         <tbody>
           <tr class="exhibitor_table_rows">
             <td class="sale_number">{{this.saleNumber}}</td>
-            <td>{{exhibitor.fullName}}</td>
+            <td v-if="exhibitor != null">{{exhibitor.fullName}}</td>
 
             <!-- Buyers -->
             <td>
@@ -30,9 +32,81 @@
             <td>
               <table>
                 <tbody>
-                  <tr class="addon_rows" v-if="addon.purchaseType != buyer" v-for="addon in addons" :key="addon._id">
+                  <tr class="addon_rows" v-if="addon.column == 1" v-for="addon in addons" :key="addon._id">
                     <td>{{ addon.name }}</td>
-                    <td>{{ addon.purchaseAmount }}</td>
+                    <td>${{ addon.purchaseAmount }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+
+            <!-- Second Addons / Addon purchase column -->
+            <td>
+              <table>
+                <tbody>
+                  <tr class="addon_rows" v-if="addon.purchaseType != buyer && addon.column >= 2" v-for="addon in addons" :key="addon._id">
+                    <td>{{ addon.name }}</td>
+                    <td>${{ addon.purchaseAmount }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+          <tr class ="table_tail">
+            <td></td>
+            <td></td>
+            <td v-if="transactions[0] != null">Purchase Amount: ${{transactions[0].purchaseAmount}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Second Exhibitor View -->
+      <table class ="exhibitor_history_table">
+        <thead>
+          <tr>
+            <th class="table_c1">Sale #</th>
+            <th class="table_c2">Exhibitor Name</th>
+            <th class="table_c3">Buyers</th>
+            <th class="table_c4">Addons</th>
+            <th class="table_c4">Addons</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="exhibitor_table_rows">
+            <td class="sale_number">{{this.saleNumber + 1}}</td>
+            <td>{{exhibitor2.fullName}}</td>
+
+            <!-- Buyers -->
+            <td>
+              <table>
+                <tbody>
+                  <tr class="buyer_rows" v-for="b in buyerNumbers2" :key="b">
+                    <td>{{ buyers[b-1].name }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+
+            <!-- Addons / Addon purchase -->
+            <td>
+              <table>
+                <tbody>
+                  <tr class="addon_rows" v-if="addon.column == 1" v-for="addon in addons2" :key="addon._id">
+                    <td>{{ addon.name }}</td>
+                    <td>${{ addon.purchaseAmount }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+
+            <!-- Second Addons / Addon purchase column -->
+            <td>
+              <table>
+                <tbody>
+                  <tr class="addon_rows" v-if="addon.purchaseType != buyer && addon.column >= 2" v-for="addon in addons2" :key="addon._id">
+                    <td>{{ addon.name }}</td>
+                    <td>${{ addon.purchaseAmount }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -43,10 +117,11 @@
           <tr class ="table_tail">
             <td></td>
             <td></td>
-            <td v-if="transactions[0] != null">Purchase Amount: ${{transactions[0].purchaseAmount}}</td>
+            <td v-if="transactions2[0] != null">Purchase Amount: ${{transactions2[0].purchaseAmount}}</td>
           </tr>
         </tbody>
       </table>
+    </div>
     </main>
 </template>
 
@@ -56,13 +131,18 @@
     data() {
       return {
         exhibitorDisplaySpeed: 5000, // milliseconds
-        saleNumber: 0,
+        saleNumber: -1,
         maxSaleNumber: 0,
         exhibitor: [],
         buyers: [],
         addons: [],
         transactions: [],
         buyerNumbers: [],
+        exhibitor2: [],
+        buyers2: [],
+        addons2: [],
+        transactions2: [],
+        buyerNumbers2: [],
         buyer: "Buyer"
       }
     },
@@ -74,13 +154,7 @@
       ...mapState({
         // saleNumber: state => state.saleNumber,
         // transactions: state => state.transactions
-      }) /* ,
-      currentTransactions: function() {
-        this.fetchAddons()
-        this.logArr()
-        console.log("Ctrans reached")
-        return this.transactions.filter(addon => addon.saleNumber == this.saleNumber)
-      } */
+      })
     },
     methods: {
       async fetchSaleNumber() {
@@ -95,7 +169,10 @@
           console.log("Waiting for display entry")
           // console.log(err)
         }
-        if (this.saleNumber < this.maxSaleNumber - 1) {
+
+        if (this.saleNumber < this.maxSaleNumber - 2) {
+          this.saleNumber = this.saleNumber + 2
+        } else if (this.saleNumber == this.maxSaleNumber - 2) {
           this.saleNumber++
         } else if (this.maxSaleNumber != 0) {
           this.saleNumber = 1
@@ -104,21 +181,36 @@
         if (this.maxSaleNumber > 0) this.fetchData()
       },
       async fetchData() {
+        this.fetchBuyers()
         this.fetchTransactions()
         this.fetchExhibitor()
-        this.fetchBuyers()
-        this.fetchBuyerNumbers()
-        this.fetchAddons()
       },
       async fetchBuyerNumbers() {
-        this.buyerNumbers = this.transactions[0].bidderNumber.split('-').map(Number)
+        let a = 0 // Buyer element of transactions
+        let b = 0 // Buyer element of transactions2
+        for (let i = 0; i < this.transactions.length; i++) {
+          if (this.transactions[i].purchaseType == "Buyer") a = i
+        }
+        for (let i = 0; i < this.transactions2.length; i++) {
+          if (this.transactions2[i].purchaseType == "Buyer") b = i
+        }
+        this.buyerNumbers = this.transactions[a].bidderNumber.split('-').map(Number)
+        if (this.transactions2.length > 0) this.buyerNumbers2 = this.transactions2[b].bidderNumber.split('-').map(Number)
+        else this.buyerNumbers2 = []
       },
       async fetchExhibitor() {
+        this.exhibitor2 = []
         // fetches the current exhibitor by its sale number
         let url = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${this.saleNumber}`
+        let url2 = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${this.saleNumber + 1}`
         await this.axios.get(url).then(response => {
           this.exhibitor = response.data
         })
+        if (this.saleNumber + 1 <= this.maxSaleNumber && this.maxSaleNumber > 2) {
+          await this.axios.get(url2).then(response => {
+            this.exhibitor2 = response.data
+          })
+        }
       },
       async fetchBuyers() {
         let uri = `http://${process.env.HOST_NAME}:8081/buyer`
@@ -128,25 +220,48 @@
       },
       async fetchTransactions() {
         let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber}`
+        let url2 = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber + 1}`
+        this.transactions2 = []
         try {
           await this.axios.get(url).then(response => {
             this.transactions = response.data
           })
+          if (this.saleNumber + 1 <= this.maxSaleNumber && this.maxSaleNumber > 2) {
+            await this.axios.get(url2).then(response => {
+              this.transactions2 = response.data
+            })
+          }
         } catch (err) {
           console.log("Waiting for transactions to occur")
         }
+        this.fetchAddons()
+        this.fetchBuyerNumbers()
       },
       async fetchAddons() {
         this.addons = []
+        this.addons2 = []
+        let col = 1
         for (let i = 0; i < this.transactions.length; i++) {
           if (this.transactions[i].purchaseType == "Addon") {
+            col = Math.floor(i / 8 + 1)
             this.addons.push({
-            name: this.buyers[this.transactions[i].bidderNumber].name,
-            purchaseAmount: this.transactions[i].purchaseAmount
+            name: this.buyers[this.transactions[i].bidderNumber - 1].name,
+            purchaseAmount: this.transactions[i].purchaseAmount,
+            column: col
             })
           }
         }
-        console.log(this.addons)
+
+        for (let i = 0; i < this.transactions2.length; i++) {
+          if (this.transactions2[i].purchaseType == "Addon") {
+            col = Math.floor(i / 8 + 1)
+            this.addons2.push({
+            name: this.buyers[this.transactions2[i].bidderNumber - 1].name,
+            purchaseAmount: this.transactions2[i].purchaseAmount,
+            column: col
+            })
+          }
+        }
     },
       ...mapActions(['setSaleNumber', 'setTransactions'])
     }
@@ -156,9 +271,14 @@
 
 
 <css>
+.exhibitorHistory{
+  height:100vh; }
+
+.table_view {
+  height: 87%;  }
+
 .history_display_header {
   font-size: 50px;
-  line-height: 100%;
   color: #339966;
   text-align: center;
   text-transform: uppercase; }
@@ -169,6 +289,7 @@
   padding: 10px 15px;
   border: 1px solid #339966;
   color: #404040;
+  height: 30%;
   width: 99%; }
 
 .table_c1 {
@@ -183,7 +304,7 @@
 .table_c2,
 .table_c3,
 .table_c4 {
-  width: 32%;
+  width: 25%;
   color: #339966;
   font-size: 25px; }
 
