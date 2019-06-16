@@ -139,7 +139,6 @@
         transactions: [],
         buyerNumbers: [],
         exhibitor2: [],
-        buyers2: [],
         addons2: [],
         transactions2: [],
         buyerNumbers2: [],
@@ -182,8 +181,8 @@
       },
       async fetchData() {
         this.fetchBuyers()
-        this.fetchTransactions()
         this.fetchExhibitor()
+        this.fetchTransactions()
       },
       async fetchBuyerNumbers() {
         let a = 0 // Buyer element of transactions
@@ -218,6 +217,9 @@
           this.buyers = response.data
         })
       },
+      async sortBuyers() {
+        this.buyers = this.buyers.sort((a, b) => a.bidderNumber - b.bidderNumber)
+      },
       async fetchTransactions() {
         let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber}`
         let url2 = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber + 1}`
@@ -240,6 +242,8 @@
       async fetchAddons() {
         this.addons = []
         this.addons2 = []
+        await this.sortBuyers()
+        
         let col = 1
         for (let i = 0; i < this.transactions.length; i++) {
           if (this.transactions[i].purchaseType == "Addon") {
