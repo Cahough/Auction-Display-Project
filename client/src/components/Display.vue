@@ -168,7 +168,11 @@
         }
       },
       async parseBidderNumber() {
-        this.bidderNumbers = this.transactions[0].bidderNumber.split('-')
+        let index = 0
+        for (let i = 0; i < this.transactions.length; i++) {
+          if (this.transactions[i].purchaseType == "Buyer") index = i
+        }
+        this.bidderNumbers = this.transactions[index].bidderNumber.split('-')
       },
       async fetchAddOns() {
         let uri = `http://${process.env.HOST_NAME}:8081/buyer`
