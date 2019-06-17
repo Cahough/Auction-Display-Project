@@ -7,11 +7,11 @@
       <div class="grid-container">
         <div class="current_sale_form">
         <div class="green_border">
+          <button class="form__button" @click="displayCurrentExhibitor">Submit To Current Sale</button>
           <p class="input-field__label">Sale Number</p>
           <input v-validate="'required|numeric'" type="number" v-on:input="getExhibitorBySaleNum" name="saleNumber" v-model="saleNumber">
           <label class="errorLabel" for="saleNumber" >{{ errors.first('saleNumber') }}</label>
           <label class="input__name-label">Exhibitor Name: {{ exhibitorName }}</label>
-          <button class="form__button" @click="displayCurrentExhibitor">Submit To Current Sale</button>
         </div>
         <div class="green_border">
           <section class="form__section">
@@ -24,7 +24,7 @@
         </div>
         <div class="green_border">
           <section class="form__section">
-            <p class="input-field__label">Transaction Bidder Number</p>
+            <p class="input-field__label">Addon Bidder Number</p>
             <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
             <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
             <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
@@ -92,7 +92,7 @@
               <tr>
                 <td>Change View: </td>
                 <td><input></td>
-                <td><button class="temp_button">Submit</button></td>
+                <td><button class="temp_button2">Submit</button></td>
               </tr>
             </table>
           </div>
@@ -129,22 +129,25 @@
         </div>
       </div>
     </main>
-    <router-link v-bind:to="{ name: 'Admin' }">
-      <button class="transaction__top-button--yellow"><span class="button-arrow">&#8592;</span> Delete ALL Transactions</button>
-    </router-link>
   </div>
 </template>
 
 <css>
 .temp_button {
-  background-color: #fadc23;;
+  background-color: #fadc23;
   color: green;
   margin-bottom: 15px;
   padding: 10px 15px;
 }
 
+.temp_button2 {
+  color: green;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #f1f1f1; }
+
 .green_border {
-  padding: 5px;
+  padding: 10px;
   margin: 10px;
   border: 1px solid green;  }
 
@@ -158,7 +161,7 @@
   margin: 20px; }
 
 .current_sale_view {
-  height: 40vh;
+  height: 43vh;
   margin: 20px;
   color: #ffffff;
   background-color: #339966;  }
