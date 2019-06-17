@@ -1,5 +1,5 @@
 <template>
-  <div class="transaction">
+  <div class="alternative_transaction">
     <router-link v-bind:to="{ name: 'Admin' }">
       <button class="transaction__top-button--yellow"><span class="button-arrow">&#8592;</span> Return to Dashboard</button>
     </router-link>
@@ -11,6 +11,19 @@
           <label class="errorLabel" for="saleNumber" >{{ errors.first('saleNumber') }}</label>
           <label class="input__name-label">Exhibitor Name: {{ exhibitorName }}</label>
           <button class="form__button" @click="displayCurrentExhibitor">Submit Current Sale</button>
+          <section class="form__section">
+            <p class="input-field__label">Bidder Number</p>
+            <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
+            <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
+            <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
+            <button class="form__button--second" @click="addNewBidder">Add Another Bidder</button>
+          </section>
+          <section class="form__section">
+            <p class="input-field__label">Amount:</p>
+            <label class="errorLabel" for="purchaseAmount" >{{ errors.first('purchaseAmount') }}</label>
+            <input v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount">
+            <button class="form__button" name="addBtn" @click="addNewTransaction">Submit & Go To Next Sale</button>
+          </section>
         </div>
         <div class="current_sale_view">
           <div class="current_exhibitor">
@@ -48,7 +61,12 @@
             </table>
           </div>
         </div>
-        <div class="tempGrid"></div>
+        <div class="previous_sale_view">
+          <div class="previous_exhibitor"></div>
+          <div class="previous_buyers"></div>
+          <div class="previous_addons"></div>
+          <div class="previous_addons"></div>
+        </div>
       </div>
     </main>
     <router-link v-bind:to="{ name: 'Admin' }">
@@ -58,6 +76,10 @@
 </template>
 
 <css>
+.alternative_transaction {
+  text-align: center;
+  margin: 10px;
+}
 .current_sale_form {
   border: 1px solid green;
   padding: 10px;
@@ -68,30 +90,48 @@
   color: #ffffff;
   background-color: #339966;  }
 
-  .grid-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  grid-template-areas: "current_sale_form current_sale_view current_sale_view current_sale_view current_sale_view" "tempGrid tempGrid tempGrid tempGrid tempGrid" "tempGrid tempGrid tempGrid tempGrid tempGrid";
-}
+  .previous_sale_view {
+    border: 1px solid #339966;
+    margin: 20px; }
 
-.current_sale_form { grid-area: current_sale_form; }
+    .grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-areas: "current_sale_form current_sale_view current_sale_view current_sale_view" "current_sale_form current_sale_view current_sale_view current_sale_view" "current_sale_form previous_sale_view previous_sale_view previous_sale_view" "current_sale_form previous_sale_view previous_sale_view previous_sale_view";
+  }
 
-.current_sale_view {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  grid-template-areas: "current_exhibitor current_exhibitor_buyers current_exhibitor_addons current_exhibitor_addons2";
-  grid-area: current_sale_view;
-}
+  .current_sale_form { grid-area: current_sale_form; }
 
-.current_exhibitor { grid-area: current_exhibitor; }
+  .current_sale_view {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: "current_exhibitor current_buyers current_addons current_addons" "current_exhibitor current_buyers current_addons current_addons";
+    grid-area: current_sale_view;
+  }
 
-.current_exhibitor_buyers { grid-area: current_exhibitor_buyers; }
+  .current_exhibitor { grid-area: current_exhibitor; }
 
-.current_exhibitor_addons { grid-area: current_exhibitor_addons; }
+  .current_buyers { grid-area: current_buyers; }
 
-.current_exhibitor_addons2 { grid-area: current_exhibitor_addons2; }
+  .current_addons { grid-area: current_addons; }
 
-.tempGrid { grid-area: tempGrid; }
+  .current_addons { grid-area: current_addons; }
+
+  .previous_sale_view {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: "previous_exhibitor previous_buyers previous_addons previous_addons" "previous_exhibitor previous_buyers previous_addons previous_addons";
+    grid-area: previous_sale_view;
+  }
+
+  .previous_exhibitor { grid-area: previous_exhibitor; }
+
+  .previous_buyers { grid-area: previous_buyers; }
+
+  .previous_addons { grid-area: previous_addons; }
+
+  .previous_addons { grid-area: previous_addons; }
 </css>
