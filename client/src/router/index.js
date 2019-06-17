@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Login from '@/components/Login'
 import Admin from '@/components/Admin'
 import Display from '@/components/Display'
-import ExhibitorHistory from '@/components/ExhibitorHistory'
 import Construction from '@/components/Construction'
 import Manage from '@/components/Manage'
 import ManageExhibitors from '@/components/ManageExhibitors'
@@ -14,6 +13,8 @@ import EditBuyer from '@/components/EditBuyer'
 import EditExhibitor from '@/components/EditExhibitor'
 import BuyerTransaction from '@/components/BuyerTransaction'
 import AddOnTransaction from '@/components/AddonTransaction'
+import ExhibitorHistory from '@/components/ExhibitorHistory'
+import GuiTransaction from '@/components/GuiTransaction'
 
 Vue.use(Router)
 
@@ -45,6 +46,11 @@ export default new Router({
       path: '/exhibitor/history',
       name: 'ExhibitorHistory',
       component: ExhibitorHistory
+    },
+    {
+      path: '/transaction/gui',
+      name: 'GuiTransaction',
+      component: GuiTransaction
     },
     {
       path: '/buyer',
