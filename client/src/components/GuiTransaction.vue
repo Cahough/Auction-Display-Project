@@ -6,42 +6,42 @@
     <main>
       <div class="grid-container">
         <div class="current_sale_form">
-        <div class="green_border">
-          <button class="form__button" @click="displayCurrentExhibitor">Submit To Current Sale</button>
-          <p class="input-field__label">Sale Number</p>
-          <input v-validate="'required|numeric'" type="number" v-on:input="getExhibitorBySaleNum" name="saleNumber" v-model="saleNumber">
-          <label class="errorLabel" for="saleNumber" >{{ errors.first('saleNumber') }}</label>
-          <label class="input__name-label">Exhibitor Name: {{ exhibitorName }}</label>
-        </div>
-        <div class="green_border">
-          <section class="form__section">
-            <p class="input-field__label">Buyer Bidder Number</p>
-            <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
-            <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
-            <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
-            <button class="form__button--second" @click="addNewBidder">Add Bidder</button>
-          </section>
-        </div>
-        <div class="green_border">
-          <section class="form__section">
-            <p class="input-field__label">Addon Bidder Number</p>
-            <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
-            <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
-            <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
-            <p class="input-field__label">Amount</p>
-            <label class="errorLabel" for="purchaseAmount" >{{ errors.first('purchaseAmount') }}</label>
-            <input v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount">
-            <button class="form__button--second" name="addBtn" @click="addNewTransaction">Submit Addon</button>
-          </section>
-        </div>
+          <div class="green_border">
+            <button class="form__button" @click="displayCurrentExhibitor">Submit To Current Sale</button>
+            <p class="input-field__label">Sale Number</p>
+            <input v-validate="'required|numeric'" type="number" v-on:input="getExhibitorBySaleNum" name="saleNumber" v-model="saleNumber">
+            <label class="errorLabel" for="saleNumber" >{{ errors.first('saleNumber') }}</label>
+            <label class="input__name-label">Exhibitor Name: {{ exhibitorName }}</label>
+          </div>
+          <div class="green_border">
+            <section class="form__section">
+              <p class="input-field__label">Buyer Bidder Number</p>
+              <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
+              <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
+              <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
+              <button class="form__button--second" @click="addNewBidder">Add Bidder</button>
+            </section>
+          </div>
+          <div class="green_border">
+            <section class="form__section">
+              <p class="input-field__label">Addon Bidder Number</p>
+              <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
+              <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
+              <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
+              <p class="input-field__label">Amount</p>
+              <label class="errorLabel" for="purchaseAmount" >{{ errors.first('purchaseAmount') }}</label>
+              <input v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount">
+              <button class="form__button--second" name="addBtn" @click="addNewTransaction">Submit Addon</button>
+            </section>
+          </div>
         </div>
         <div class="current_sale_view">
           <div class="current_exhibitor">
             <p>Current Sale:</p>
-            <p class="exhibitor_name">Andrew Vidwin</p>
-            <p>3</p>
+            <p>Waiting for get Function</p>
+            <p>#</p>
           </div>
-          <div class="current_exhibitor_buyers">
+          <div class="current_buyers">
             <table>
               <thead>Buyers</thead>
               <tr><td>b 1</td><td>Delete</td></tr>
@@ -56,15 +56,8 @@
               <tr><td> </td></tr>
               <tr><td> </td></tr>
             </table>
-            <table>
-              <tr>
-                <td>Purchase Amount: </td>
-                <td><input></td>
-                <td><button class="temp_button">Submit & Go To Next Sale</button></td>
-              </tr>
-            </table>
           </div>
-          <div class="current_exhibitor_addons">
+          <div class="current_addons">
             <table>
               <thead>Addons</thead>
               <tr><td>a 1</td><td>$10</td><td>Delete</td></tr>
@@ -73,7 +66,7 @@
               <tr><td>a 4</td><td>$10</td><td>Delete</td></tr>
             </table>
           </div>
-          <div class="current_exhibitor_addons2">
+          <div class="current_addons2">
             <table>
               <thead>Addons</thead>
               <tr><td>a 5</td><td>$10</td><td>Delete</td></tr>
@@ -82,21 +75,23 @@
               <tr><td>a 8</td><td>$10</td><td>Delete</td></tr>
             </table>
           </div>
+          <div class="button_holder">
+            <table>
+              <tr>
+                <td>Purchase Amount: </td>
+                <td><input></td>
+                <td><button class="temp_button">Submit & Go To Next Sale</button></td>
+              </tr>
+            </table>
+          </div>
         </div>
         <div class="previous_sale_view">
           <div class="previous_exhibitor">
             <p>Previous Sale:</p>
-            <p class="exhibitor_name">Tom Bulwark</p>
-            <p>2</p>
-            <table>
-              <tr>
-                <td>Change View: </td>
-                <td><input></td>
-                <td><button class="temp_button2">Submit</button></td>
-              </tr>
-            </table>
+            <p>Waiting for transactions</p>
+            <p>#</p>
           </div>
-          <div class="previous_exhibitor_buyers">
+          <div class="previous_buyers">
             <table>
               <thead>Buyers</thead>
               <tr><td>b 1</td><td>Delete</td></tr>
@@ -108,7 +103,7 @@
               </tr>
             </table>
           </div>
-          <div class="previous_exhibitor_addons">
+          <div class="previous_addons">
             <table>
               <thead>Addons</thead>
               <tr><td>a 1</td><td>$10</td><td>Delete</td></tr>
@@ -117,7 +112,7 @@
               <tr><td>a 4</td><td>$10</td><td>Delete</td></tr>
             </table>
           </div>
-          <div class="previous_exhibitor_addons2">
+          <div class="previous_addons2">
             <table>
               <thead>Addons</thead>
               <tr><td>a 5</td><td>$10</td><td>Delete</td></tr>
@@ -126,11 +121,79 @@
               <tr><td>a 8</td><td>$10</td><td>Delete</td></tr>
             </table>
           </div>
+          <div class="button_holder">
+            <table>
+              <tr>
+                <td>Change View: </td>
+                <td><input class="change_view_input"></td>
+                <td><button class="temp_button2">Submit</button></td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
     </main>
   </div>
 </template>
+
+<script>
+  export default {
+    name: 'GuiTransaction',
+    data () {
+      return {
+        saleNumber: 0,
+        previousSaleNumber: 0,
+        bidderNumber: 0,
+        purchaseAmount: 0,
+        buyerName: "",
+        exhibitorName: "",
+        purchaseType: "Buyer",
+        showCurrentSale: false,
+        showPreviousSale: false,
+        displayID: 0,
+        bidders: []
+      }
+    },
+    created: function () {
+      this.fetchDisplay()
+    },
+    methods: {
+      async fetchDisplay () {
+        let url = `http://${process.env.HOST_NAME}:8081/display`
+        await this.axios.get(url).then(response => {
+          if (response.data.length >= 1) this.displayID = response.data[0]._id
+        })
+      },
+      async displayCurrentExhibitor() {
+        // sets flag to display the current sale
+        this.showCurrentSale = true
+        // this.showCurrentSaleSection = true
+        let state = {
+          saleNumber: this.saleNumber,
+          previousSaleNumber: this.previousSaleNumber,
+          showCurrentSale: this.showCurrentSale,
+          showPreviousSale: this.showPreviousSale
+        }
+        let uri = `http://${process.env.HOST_NAME}:8081/display/${this.displayID}`
+        await this.axios.put(uri, state).then((response) => { })
+      },
+      async addNewBidder () {},
+      async addNewTransaction () {},
+      async getExhibitorBySaleNum () {
+        let uri = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${this.saleNumber}`
+        await this.axios.get(uri).then(response => {
+          if (response.data == null) {
+            this.exhibitorName = `Exhibitor with sale number ${this.saleNumber} does not exist.`
+          }
+          else {
+            this.exhibitorName = response.data.fullName
+          }
+        })
+      },
+      async getBuyerByBiderNum () {}
+    }
+  }
+</script>
 
 <css>
 .temp_button {
@@ -145,6 +208,9 @@
   margin-bottom: 15px;
   padding: 10px 15px;
   background-color: #f1f1f1; }
+
+.change_view_input {
+  border: 1px solid green; }
 
 .green_border {
   padding: 10px;
@@ -186,8 +252,8 @@
 .current_sale_view {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  grid-template-areas: "current_exhibitor current_buyers current_addons current_addons";
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-areas: "current_exhibitor current_buyers current_addons current_addons2" "current_exhibitor current_buyers current_addons current_addons2" "current_exhibitor current_buyers current_addons current_addons2" "current_exhibitor current_buyers current_addons current_addons2" "button_holder button_holder button_holder button_holder";
   grid-area: current_sale_view;
 }
 
@@ -197,13 +263,15 @@
 
 .current_addons { grid-area: current_addons; }
 
-.current_addons { grid-area: current_addons; }
+.button_holder { grid-area: button_holder; }
+
+.current_addons2 { grid-area: current_addons2; }
 
 .previous_sale_view {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  grid-template-areas: "previous_exhibitor previous_buyers previous_addons previous_addons";
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-areas: "previous_exhibitor previous_buyers previous_addons previous_addons2" "previous_exhibitor previous_buyers previous_addons previous_addons2" "previous_exhibitor previous_buyers previous_addons previous_addons2" "previous_exhibitor previous_buyers previous_addons previous_addons2" "button_holder button_holder button_holder button_holder";
   grid-area: previous_sale_view;
 }
 
@@ -213,5 +281,7 @@
 
 .previous_addons { grid-area: previous_addons; }
 
-.previous_addons { grid-area: previous_addons; }
+.button_holder { grid-area: button_holder; }
+
+.previous_addons2 { grid-area: previous_addons2; }
 </css>
