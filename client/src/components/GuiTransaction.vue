@@ -149,7 +149,7 @@
         currentSaleCheck: false,
         previousSaleCheck: false,
         display: [],
-        bidders: [1, 2, 3], // To submit to current exhibitor
+        bidders: [], // To submit to current exhibitor
         exhibitor: [], // Current display exhibitor with purchaseAmount
         buyerNumbers: [], // Current display buyers
         buyers: [], // Complete buyers list
