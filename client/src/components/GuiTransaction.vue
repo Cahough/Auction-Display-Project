@@ -69,10 +69,13 @@
           <div class="current_addons2">
             <table>
               <thead>Addons</thead>
-              <tr><td>a 5</td><td>$10</td><td>Delete</td></tr>
-              <tr><td>a 6</td><td>$10</td><td>Delete</td></tr>
-              <tr><td>a 7</td><td>$10</td><td>Delete</td></tr>
-              <tr><td>a 8</td><td>$10</td><td>Delete</td></tr>
+              <tbody>
+                <tr v-if="addon.column == 2" v-for="addon in addons" :key="addon._id">
+                  <td>{{ addon.name }}</td>
+                  <td>${{ addon.purchaseAmount }}</td>
+                  <td>Delete</td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div class="button_holder">
@@ -323,7 +326,7 @@
         let col = 1
         for (let i = 0; i < this.transactions.length; i++) {
           if (this.transactions[i].purchaseType == "Addon") {
-            col = Math.floor(i / 8 + 1)
+            col = Math.floor(i / 11 + 1)
             this.addons.push({
             name: this.buyers[this.transactions[i].bidderNumber - 1].name,
             purchaseAmount: this.transactions[i].purchaseAmount,
