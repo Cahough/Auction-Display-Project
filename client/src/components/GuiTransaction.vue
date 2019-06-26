@@ -25,9 +25,9 @@
           <div class="green_border">
             <section class="form__section">
               <p class="input-field__label">Addon Bidder Number</p>
-              <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
-              <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
-              <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
+              <input v-validate="'required|numeric'" type="number" v-on:input="getAddonByBidderNum" name="addonNumber" v-model="addonNumber">
+              <label class="errorLabel" for="saleNumber" >{{ errors.first('addonNumber') }}</label>
+              <label class="input__name-label">Buyer Name: {{ addonName }}</label>
               <p class="input-field__label">Amount</p>
               <label class="errorLabel" for="purchaseAmount" >{{ errors.first('purchaseAmount') }}</label>
               <input v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount">
@@ -57,10 +57,13 @@
           <div class="current_addons">
             <table>
               <thead>Addons</thead>
-              <tr><td>a 1</td><td>$10</td><td>Delete</td></tr>
-              <tr><td>a 2</td><td>$10</td><td>Delete</td></tr>
-              <tr><td>a 3</td><td>$10</td><td>Delete</td></tr>
-              <tr><td>a 4</td><td>$10</td><td>Delete</td></tr>
+              <tbody>
+                <tr v-if="addon.column == 1" v-for="addon in addons" :key="addon._id">
+                  <td>{{ addon.name }}</td>
+                  <td>${{ addon.purchaseAmount }}</td>
+                  <td>Delete</td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div class="current_addons2">
@@ -134,15 +137,18 @@
 </template>
 
 <script>
+  import {mapState, mapActions} from 'vuex'
   export default {
     name: 'GuiTransaction',
     data () {
       return {
         saleNumber: 0, // Active number to submit or add to
         previousSaleNumber: 0,
-        bidderNumber: 0, // To submit new addon
+        bidderNumber: 0, // To submit new buyer
+        addonNumber: 0, // To submit new addon
         purchaseAmount: 0, // To submit to current exhibitor with bidders[]
         buyerName: "",
+        addonName: "",
         exhibitorName: "",
         showCurrentSale: false,
         showPreviousSale: false,
@@ -161,6 +167,12 @@
     },
     created: function () {
       this.fetchData()
+    },
+    computed: {
+      ...mapState({
+        // saleNumber: state => state.saleNumber,
+        // transactions: state => state.transactions
+      })
     },
     methods: {
       async fetchData() {
@@ -269,8 +281,19 @@
           }
         })
       },
+      async getAddonByBidderNum() {
+        let uri = `http://${process.env.HOST_NAME}:8081/buyer/bidderNumber/${this.addonNumber}`
+        await this.axios.get(uri).then(response => {
+          if (response.data == null) {
+            this.addonName = `Buyer with bidder number ${this.addonNumber} does not exist.`
+          }
+          else {
+            this.addonName = response.data.name
+          }
+        })
+      },
       async fetchTransactions() {
-        let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber}`
+        let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.display.saleNumber}`
         try {
           await this.axios.get(url).then(response => {
             this.transactions = response.data
@@ -280,6 +303,7 @@
         }
         this.fetchAddons()
         this.fetchBuyerNumbers()
+        console.log(this.transactions[0])
       },
       async fetchBuyers() {
         let uri = `http://${process.env.HOST_NAME}:8081/buyer`
@@ -306,7 +330,8 @@
           }
         }
       },
-      async fetchBuyerNumbers() {}
+      async fetchBuyerNumbers() {},
+      ...mapActions(['setSaleNumber', 'setTransactions'])
     }
   }
 </script>
