@@ -189,6 +189,7 @@
             this.fetchExhibitor(response.data[0].saleNumber)
           }
         })
+        this.fetchTransactions()
       },
       async displayCurrentExhibitor() {
         // sets flag to display the current sale
@@ -235,13 +236,14 @@
       async addNewAddonTransaction() {
         let newTransaction = {
           saleNumber: this.saleNumber,
-          bidderNumber: this.bidderNumber,
+          bidderNumber: this.addonNumber,
           purchaseAmount: this.purchaseAmount,
           purchaseType: "Addon"
         }
         let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
         await this.axios.post(uri, newTransaction).then((response) => {
           console.log(response)
+          this.fetchTransactions()
         })
       },
       async addNewBidder() {
