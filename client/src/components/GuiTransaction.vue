@@ -29,8 +29,8 @@
               <label class="errorLabel" for="saleNumber" >{{ errors.first('addonNumber') }}</label>
               <label class="input__name-label">Buyer Name: {{ addonName }}</label>
               <p class="input-field__label">Amount</p>
-              <label class="errorLabel" for="purchaseAmount" >{{ errors.first('purchaseAmount') }}</label>
-              <input v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount">
+              <label class="errorLabel" for="addonPurchaseAmount" >{{ errors.first('addonPurchaseAmount') }}</label>
+              <input v-validate="'required|numeric'" type="number" name="addonPurchaseAmount" v-model="addonPurchaseAmount">
               <button class="form__button--second" name="addBtn" @click="addNewAddonTransaction">Submit Addon</button>
             </section>
           </div>
@@ -38,7 +38,7 @@
         <div class="current_sale_view">
           <div class="current_exhibitor">
             <p>Current Sale:</p>
-            <p v-if="(previousSaleNumber != exhibitor.saleNumber)">{{exhibitor.fullName}}</p>
+            <p v-if="previousSaleNumber != exhibitor.saleNumber">{{exhibitor.fullName}}</p>
             <p v-else>Waiting for New Exhibitor</p>
             <p v-if="exhibitor != null && previousSaleNumber != exhibitor.saleNumber">{{exhibitor.saleNumber}}</p>
             <p v-else>#</p>
@@ -57,11 +57,11 @@
           <div class="current_addons">
             <table>
               <thead>Addons</thead>
-              <tbody>
+              <tbody v-if="previousSaleNumber != exhibitor.saleNumber">
                 <tr v-if="addon.column == 1" v-for="addon in addons" :key="addon._id">
                   <td>{{ addon.name }}</td>
                   <td>${{ addon.purchaseAmount }}</td>
-                  <td>Delete</td>
+                  <td @click="deleteBuyer(buyer._id)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -69,11 +69,11 @@
           <div class="current_addons2">
             <table>
               <thead>Addons</thead>
-              <tbody>
+              <tbody v-if="previousSaleNumber != exhibitor.saleNumber">
                 <tr v-if="addon.column == 2" v-for="addon in addons" :key="addon._id">
                   <td>{{ addon.name }}</td>
                   <td>${{ addon.purchaseAmount }}</td>
-                  <td>Delete</td>
+                  <td @click="deleteBuyer(buyer._id)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -81,9 +81,13 @@
           <div class="button_holder">
             <table>
               <tr>
-                <td>Purchase Amount: </td>
-                <td><input></td>
-                <td><button class="temp_button">Submit & Go To Next Sale</button></td>
+                <td></td>
+                <td><label class="errorLabel" for="purchaseAmount" >{{ errors.first('purchaseAmount') }}</label></td>
+              </tr>
+              <tr>
+                <td>Purchase Amount:</td>
+                <td><input v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount"></td>
+                <td><button class="temp_button" name="addBtn" @click="addNewBuyerTransaction">Submit & Go To Next Sale</button></td>
               </tr>
             </table>
           </div>
@@ -149,6 +153,7 @@
         previousSaleNumber: 0,
         bidderNumber: 0, // To submit new buyer
         addonNumber: 0, // To submit new addon
+        addonPurchaseAmount: 0, // To submit with addonNumber
         purchaseAmount: 0, // To submit to current exhibitor with bidders[]
         buyerName: "",
         addonName: "",
@@ -160,6 +165,7 @@
         display: [],
         bidders: [], // To submit to current exhibitor
         exhibitor: [], // Current display exhibitor with purchaseAmount
+        previousExhibitor: [],
         buyerNumbers: [], // Current display buyers
         buyers: [], // Complete buyers list
         addons: [], // Current exhibitor addons list
@@ -179,6 +185,7 @@
     },
     methods: {
       async fetchData() {
+        this.fetchPreviousExhibitor()
         this.fetchDisplay()
         this.fetchBuyers()
         this.fetchExhibitor()
@@ -206,6 +213,7 @@
         }
         let uri = `http://${process.env.HOST_NAME}:8081/display/${this.display._id}`
         await this.axios.put(uri, state).then((response) => { })
+        this.fetchData()
       },
       async addNewBuyerTransaction() {
         // checks how many bidders there are, joins it if there's more than one
@@ -213,15 +221,22 @@
         else this.bidders = this.bidderNumber.toString()
 
         let newTransaction = {
-          saleNumber: this.saleNumber,
+          saleNumber: this.display.saleNumber,
           bidderNumber: this.bidders,
           purchaseAmount: this.purchaseAmount,
-          purchaseType: this.purchaseType
+          purchaseType: "Buyer"
         }
         let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
-        await this.axios.post(uri, newTransaction).then((response) => {
-          console.log(response)
-        })
+        try {
+          await this.axios.post(uri, newTransaction).then((response) => {
+            console.log(response)
+          })
+        } catch (err) {
+          await this.axios.post(uri, newTransaction).then((response) => {
+            console.log(err)
+            console.log("Second Attempt: " + response)
+          })
+        }
 
         // sets flag to show previous sale
         this.showPreviousSale = true
@@ -231,16 +246,19 @@
           showCurrentSale: this.showCurrentSale,
           showPreviousSale: this.showPreviousSale
         }
-        await this.axios.put(`http://${process.env.HOST_NAME}:8081/display/` + this.display._id, state).then(response => { })
-        // empties array of bidders
+        await this.axios.put(`http://${process.env.HOST_NAME}:8081/display/` + this.display._id, state).then(response => {
+          console.log(response)
+        })
         this.bidders = []
+        this.addons = []
         this.saleNumber++
+        this.fetchPreviousExhibitor()
       },
       async addNewAddonTransaction() {
         let newTransaction = {
           saleNumber: this.saleNumber,
           bidderNumber: this.addonNumber,
-          purchaseAmount: this.purchaseAmount,
+          purchaseAmount: this.addonPurchaseAmount,
           purchaseType: "Addon"
         }
         let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
@@ -273,6 +291,23 @@
         let url = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${saleNumber}`
         await this.axios.get(url).then(response => {
           this.exhibitor = response.data
+        })
+      },
+      async fetchPreviousExhibitor() {
+        // gets the previous sale number from the most recent transaction
+        await this.axios.get(`http://${process.env.HOST_NAME}:8081/transaction`).then(response => {
+          let index = response.data.length - 1
+          while (response.data.length > 0) {
+            if (response.data[index].purchaseType === "Buyer") {
+              this.previousSaleNumber = response.data[index].saleNumber
+              break
+            } else index--
+          }
+        })
+        // fetches the previous exhibitor by the previous sale number
+        let url = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${this.previousSaleNumber}`
+        await this.axios.get(url).then(response => {
+          this.previousExhibitor = response.data
         })
       },
       async getBuyerByBidderNum() {
@@ -334,6 +369,9 @@
             })
           }
         }
+      },
+      async deleteBuyer(id) {
+
       },
       async fetchBuyerNumbers() {},
       ...mapActions(['setSaleNumber', 'setTransactions'])
