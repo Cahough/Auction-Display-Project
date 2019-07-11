@@ -49,7 +49,7 @@
               <tbody>
                 <tr v-for="b in bidders" :key="b">
                   <td>{{ buyers[b-1].name }}</td>
-                  <td>Delete</td>
+                  <td @click="deleteBuyer(b._id)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -61,7 +61,7 @@
                 <tr v-if="addon.column == 1" v-for="addon in addons" :key="addon._id">
                   <td>{{ addon.name }}</td>
                   <td>${{ addon.purchaseAmount }}</td>
-                  <td @click="deleteBuyer(buyer._id)">Delete</td>
+                  <td @click="deleteAddon(addon._id)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -73,7 +73,7 @@
                 <tr v-if="addon.column == 2" v-for="addon in addons" :key="addon._id">
                   <td>{{ addon.name }}</td>
                   <td>${{ addon.purchaseAmount }}</td>
-                  <td @click="deleteBuyer(buyer._id)">Delete</td>
+                  <td @click="deleteAddon(addon._id)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -218,7 +218,7 @@
       async addNewBuyerTransaction() {
         // checks how many bidders there are, joins it if there's more than one
         if (this.bidders.length > 1) this.bidders = this.bidders.join('-')
-        else this.bidders = this.bidderNumber.toString()
+        else this.bidders = this.bidders.toString()
 
         let newTransaction = {
           saleNumber: this.display.saleNumber,
@@ -227,16 +227,18 @@
           purchaseType: "Buyer"
         }
         let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
-        try {
-          await this.axios.post(uri, newTransaction).then((response) => {
-            console.log(response)
+
+        // Attempts post to db, on fail tries again
+        await this.axios.post(uri, newTransaction)
+          .then((response) => { console.log(response) })
+          .catch((err) => {
+            window.alert(
+              "Failed with:\n" +
+              err +
+              "\nsaleNumber: " + this.display.saleNumber +
+              "\nbidderNumber: " + this.bidders +
+              "\npurchaseAmount: " + this.purchaseAmount)
           })
-        } catch (err) {
-          await this.axios.post(uri, newTransaction).then((response) => {
-            console.log(err)
-            console.log("Second Attempt: " + response)
-          })
-        }
 
         // sets flag to show previous sale
         this.showPreviousSale = true
@@ -246,13 +248,14 @@
           showCurrentSale: this.showCurrentSale,
           showPreviousSale: this.showPreviousSale
         }
-        await this.axios.put(`http://${process.env.HOST_NAME}:8081/display/` + this.display._id, state).then(response => {
-          console.log(response)
-        })
-        this.bidders = []
-        this.addons = []
-        this.saleNumber++
-        this.fetchPreviousExhibitor()
+        await this.axios.put(`http://${process.env.HOST_NAME}:8081/display/` + this.display._id, state)
+          .then(response => { console.log(response) })
+          .then(() => {
+            this.bidders = []
+            this.addons = []
+            this.saleNumber++
+            this.fetchPreviousExhibitor()
+          })
       },
       async addNewAddonTransaction() {
         let newTransaction = {
@@ -334,16 +337,13 @@
       },
       async fetchTransactions() {
         let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.display.saleNumber}`
-        try {
-          await this.axios.get(url).then(response => {
-            this.transactions = response.data
-          })
-        } catch (err) {
-          console.log("Waiting for transactions to occur")
-        }
+        await this.axios.get(url).then(response => {
+          this.transactions = response.data
+        })
+        .catch(() => console.log("Waiting for transaction to occur"))
+
         this.fetchAddons()
         this.fetchBuyerNumbers()
-        console.log(this.transactions[0])
       },
       async fetchBuyers() {
         let uri = `http://${process.env.HOST_NAME}:8081/buyer`
@@ -371,7 +371,10 @@
         }
       },
       async deleteBuyer(id) {
-
+        console.log("Delete Buyer Reached")
+      },
+      async deleteAddon(id) {
+        console.log("Delete Addon Reached")
       },
       async fetchBuyerNumbers() {},
       ...mapActions(['setSaleNumber', 'setTransactions'])
