@@ -49,7 +49,7 @@
               <tbody>
                 <tr v-for="b in bidders" :key="b">
                   <td>{{ buyers[b-1].name }}</td>
-                  <td @click="deleteBuyer(b._id)">Delete</td>
+                  <td class="clickable" @click="deleteBidder(b)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -273,8 +273,12 @@
       async addNewBidder() {
         // pushes to array if there's more than on bidder number [x]
         // has a confirmation message that it's been added to the table [ ]
-        this.bidders.push(this.bidderNumber)
-        console.log(this.bidders)
+        if (this.bidders.indexOf(this.bidderNumber) > -1) {
+          window.alert("Bidder already present!")
+        } else {
+          this.bidders.push(this.bidderNumber)
+          console.log(this.bidders)
+        }
         // resets input field
         this.bidderNumber = ""
       },
@@ -370,6 +374,9 @@
           }
         }
       },
+      deleteBidder(bidderNumber) {
+        this.bidders.splice(this.bidders.indexOf(bidderNumber), 1)
+      },
       async deleteBuyer(id) {
         console.log("Delete Buyer Reached")
       },
@@ -386,6 +393,11 @@
 .current_exhibitor_buyers {
   text-align: left;
 }
+
+.clickable:hover {
+  cursor: pointer;
+  color: #fadc23;
+  text-decoration: underline; }
 
 .temp_button {
   background-color: #fadc23;
