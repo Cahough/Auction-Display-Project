@@ -268,9 +268,14 @@
             purchaseType: "Addon"
           }
           let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
-          await this.axios.post(uri, newTransaction).then((response) => {
+          await this.axios.post(uri, newTransaction)
+          .then((response) => {
             console.log(response)
             this.fetchTransactions()
+          })
+          .then(() => {
+            this.addonNumber = 0
+            this.addonPurchaseAmount = 0
           })
         } else {
           window.alert("Addon number cannot be 0")
