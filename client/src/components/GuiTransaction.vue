@@ -16,7 +16,7 @@
           <div class="green_border">
             <section class="form__section">
               <p class="input-field__label">Buyer Bidder Number</p>
-              <input v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
+              <input @focus="clearBidder" @blur="zeroBidder" v-validate="'required|numeric'" type="number" v-on:input="getBuyerByBidderNum" name="bidderNumber" v-model="bidderNumber">
               <label class="errorLabel" for="saleNumber" >{{ errors.first('bidderNumber') }}</label>
               <label class="input__name-label">Buyer Name: {{ buyerName }}</label>
               <button class="form__button--second" @click="addNewBidder">Add Bidder</button>
@@ -25,12 +25,12 @@
           <div class="green_border">
             <section class="form__section">
               <p class="input-field__label">Addon Bidder Number</p>
-              <input v-validate="'required|numeric'" type="number" v-on:input="getAddonByBidderNum" name="addonNumber" v-model="addonNumber">
+              <input @focus="clearAddon" @blur="zeroAddon" v-validate="'required|numeric'" type="number" v-on:input="getAddonByBidderNum" name="addonNumber" v-model="addonNumber">
               <label class="errorLabel" for="saleNumber" >{{ errors.first('addonNumber') }}</label>
               <label class="input__name-label">Buyer Name: {{ addonName }}</label>
               <p class="input-field__label">Amount</p>
               <label class="errorLabel" for="addonPurchaseAmount" >{{ errors.first('addonPurchaseAmount') }}</label>
-              <input v-validate="'required|numeric'" type="number" name="addonPurchaseAmount" v-model="addonPurchaseAmount">
+              <input @focus="clearPurchase" @blur="zeroPurchase" v-validate="'required|numeric'" type="number" name="addonPurchaseAmount" v-model="addonPurchaseAmount">
               <button class="form__button--second" name="addBtn" @click="addNewAddonTransaction">Submit Addon</button>
             </section>
           </div>
@@ -61,7 +61,7 @@
                 <tr v-if="addon.column == 1" v-for="addon in addons" :key="addon._id">
                   <td>{{ addon.name }}</td>
                   <td>${{ addon.purchaseAmount }}</td>
-                  <td @click="deleteAddon(addon._id)">Delete</td>
+                  <td class="clickable" @click="deleteAddon(addon._id)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -73,7 +73,7 @@
                 <tr v-if="addon.column == 2" v-for="addon in addons" :key="addon._id">
                   <td>{{ addon.name }}</td>
                   <td>${{ addon.purchaseAmount }}</td>
-                  <td @click="deleteAddon(addon._id)">Delete</td>
+                  <td class="clickable" @click="deleteAddon(addon._id)">Delete</td>
                 </tr>
               </tbody>
             </table>
@@ -186,10 +186,12 @@
     methods: {
       async fetchData() {
         this.fetchPreviousExhibitor()
-        this.fetchDisplay()
         this.fetchBuyers()
         this.fetchExhibitor()
         this.fetchTransactions()
+        await this.fetchDisplay()
+
+        this.saleNumber = this.display.saleNumber
       },
       async fetchDisplay() {
         let url = `http://${process.env.HOST_NAME}:8081/display`
@@ -258,29 +260,35 @@
           })
       },
       async addNewAddonTransaction() {
-        let newTransaction = {
-          saleNumber: this.saleNumber,
-          bidderNumber: this.addonNumber,
-          purchaseAmount: this.addonPurchaseAmount,
-          purchaseType: "Addon"
+        if (this.addonNumber != 0) {
+          let newTransaction = {
+            saleNumber: this.saleNumber,
+            bidderNumber: this.addonNumber,
+            purchaseAmount: this.addonPurchaseAmount,
+            purchaseType: "Addon"
+          }
+          let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
+          await this.axios.post(uri, newTransaction).then((response) => {
+            console.log(response)
+            this.fetchTransactions()
+          })
+        } else {
+          window.alert("Addon number cannot be 0")
         }
-        let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
-        await this.axios.post(uri, newTransaction).then((response) => {
-          console.log(response)
-          this.fetchTransactions()
-        })
       },
       async addNewBidder() {
         // pushes to array if there's more than on bidder number [x]
         // has a confirmation message that it's been added to the table [ ]
         if (this.bidders.indexOf(this.bidderNumber) > -1) {
           window.alert("Bidder already present!")
+        } else if (this.bidderNumber == 0) {
+          window.alert("Bidder number cannot be 0")
         } else {
           this.bidders.push(this.bidderNumber)
           console.log(this.bidders)
         }
         // resets input field
-        this.bidderNumber = ""
+        this.bidderNumber = "0"
       },
       async getExhibitorBySaleNum() {
         let uri = `http://${process.env.HOST_NAME}:8081/exhibitor/saleNumber/${this.saleNumber}`
@@ -367,6 +375,7 @@
           if (this.transactions[i].purchaseType == "Addon") {
             col = Math.floor(i / 11 + 1)
             this.addons.push({
+            _id: this.transactions[i]._id,
             name: this.buyers[this.transactions[i].bidderNumber - 1].name,
             purchaseAmount: this.transactions[i].purchaseAmount,
             column: col
@@ -377,11 +386,34 @@
       deleteBidder(bidderNumber) {
         this.bidders.splice(this.bidders.indexOf(bidderNumber), 1)
       },
+      clearBidder() {
+        this.bidderNumber = this.bidderNumber == 0 ? '' : this.bidderNumber
+      },
+      zeroBidder() {
+        this.bidderNumber = this.bidderNumber == '' ? 0 : this.bidderNumber
+      },
+      clearAddon() {
+        this.addonNumber = this.addonNumber == 0 ? '' : this.addonNumber
+      },
+      zeroAddon() {
+        this.addonNumber = this.addonNumber == '' ? 0 : this.addonNumber
+      },
+      clearPurchase() {
+        this.addonPurchaseAmount = this.addonPurchaseAmount == 0 ? '' : this.addonPurchaseAmount
+      },
+      zeroPurchase() {
+        this.addonPurchaseAmount = this.addonPurchaseAmount == '' ? 0 : this.addonPurchaseAmount
+      },
       async deleteBuyer(id) {
         console.log("Delete Buyer Reached")
       },
       async deleteAddon(id) {
-        console.log("Delete Addon Reached")
+        console.log(id)
+        let uri = `http://${process.env.HOST_NAME}:8081/transaction/` + id
+        await this.axios.delete(uri).then((response) => {
+          console.log(response)
+        })
+        this.fetchTransactions()
       },
       async fetchBuyerNumbers() {},
       ...mapActions(['setSaleNumber', 'setTransactions'])
