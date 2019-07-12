@@ -25,6 +25,7 @@
           <div class="green_border">
             <section class="form__section">
               <p class="input-field__label">Addon Bidder Number</p>
+              <span class="warning_label" v-if="saleNumber != display.saleNumber"> &#9888;</span>
               <input @focus="clearAddon" @blur="zeroAddon" v-validate="'required|numeric'" type="number" v-on:input="getAddonByBidderNum" name="addonNumber" v-model="addonNumber">
               <label class="errorLabel" for="saleNumber" >{{ errors.first('addonNumber') }}</label>
               <label class="input__name-label">Buyer Name: {{ addonName }}</label>
@@ -218,46 +219,50 @@
         this.fetchData()
       },
       async addNewBuyerTransaction() {
-        // checks how many bidders there are, joins it if there's more than one
-        if (this.bidders.length > 1) this.bidders = this.bidders.join('-')
-        else this.bidders = this.bidders.toString()
+        if (this.purchaseAmount == 0) {
+          window.alert("Purchase amount cannot be 0")
+        } else {
+          // checks how many bidders there are, joins it if there's more than one
+          if (this.bidders.length > 1) this.bidders = this.bidders.join('-')
+          else this.bidders = this.bidders.toString()
 
-        let newTransaction = {
-          saleNumber: this.display.saleNumber,
-          bidderNumber: this.bidders,
-          purchaseAmount: this.purchaseAmount,
-          purchaseType: "Buyer"
+          let newTransaction = {
+            saleNumber: this.display.saleNumber,
+            bidderNumber: this.bidders,
+            purchaseAmount: this.purchaseAmount,
+            purchaseType: "Buyer"
+          }
+          let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
+
+          // Attempts post to db, on fail tries again
+          await this.axios.post(uri, newTransaction)
+            .then((response) => { console.log(response) })
+            .catch((err) => {
+              window.alert(
+                "Failed with:\n" +
+                err +
+                "\nsaleNumber: " + this.display.saleNumber +
+                "\nbidderNumber: " + this.bidders +
+                "\npurchaseAmount: " + this.purchaseAmount)
+            })
+
+          // sets flag to show previous sale
+          this.showPreviousSale = true
+          let state = {
+            saleNumber: this.saleNumber,
+            previousSaleNumber: this.previousSaleNumber,
+            showCurrentSale: this.showCurrentSale,
+            showPreviousSale: this.showPreviousSale
+          }
+          await this.axios.put(`http://${process.env.HOST_NAME}:8081/display/` + this.display._id, state)
+            .then(response => { console.log(response) })
+            .then(() => {
+              this.bidders = []
+              this.addons = []
+              this.saleNumber++
+              this.fetchPreviousExhibitor()
+            })
         }
-        let uri = `http://${process.env.HOST_NAME}:8081/transaction/add`
-
-        // Attempts post to db, on fail tries again
-        await this.axios.post(uri, newTransaction)
-          .then((response) => { console.log(response) })
-          .catch((err) => {
-            window.alert(
-              "Failed with:\n" +
-              err +
-              "\nsaleNumber: " + this.display.saleNumber +
-              "\nbidderNumber: " + this.bidders +
-              "\npurchaseAmount: " + this.purchaseAmount)
-          })
-
-        // sets flag to show previous sale
-        this.showPreviousSale = true
-        let state = {
-          saleNumber: this.saleNumber,
-          previousSaleNumber: this.previousSaleNumber,
-          showCurrentSale: this.showCurrentSale,
-          showPreviousSale: this.showPreviousSale
-        }
-        await this.axios.put(`http://${process.env.HOST_NAME}:8081/display/` + this.display._id, state)
-          .then(response => { console.log(response) })
-          .then(() => {
-            this.bidders = []
-            this.addons = []
-            this.saleNumber++
-            this.fetchPreviousExhibitor()
-          })
       },
       async addNewAddonTransaction() {
         if (this.addonNumber != 0) {
@@ -430,7 +435,17 @@
 .current_exhibitor_buyers {
   text-align: left;
 }
-
+.warning_label {
+  color: #fadc23;
+  font-size: 30px;
+}
+.warning_label:after{
+  content: &#9888;
+}
+.warning_label:hover:after{
+  font-size: 20px;
+  content: 'Sale Number is not = to Current Sale';
+}
 .clickable:hover {
   cursor: pointer;
   color: #fadc23;
