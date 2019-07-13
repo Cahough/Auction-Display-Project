@@ -87,7 +87,7 @@
               </tr>
               <tr>
                 <td>Purchase Amount:</td>
-                <td><input v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount"></td>
+                <td><input  @focus="clearCurrentPurchase" @blur="zeroCurrentPurchase" v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount"></td>
                 <td><button class="temp_button" name="addBtn" @click="addNewBuyerTransaction">Submit & Go To Next Sale</button></td>
               </tr>
             </table>
@@ -432,6 +432,12 @@
       },
       zeroPurchase() {
         this.addonPurchaseAmount = this.addonPurchaseAmount == '' ? 0 : this.addonPurchaseAmount
+      },
+      clearCurrentPurchase() {
+        this.purchaseAmount = this.purchaseAmount == 0 ? '' : this.purchaseAmount
+      },
+      zeroCurrentPurchase() {
+        this.purchaseAmount = this.purchaseAmount == '' ? 0 : this.purchaseAmount
       },
       async deleteBuyer(id) {
         console.log("Delete Buyer Reached")
