@@ -49,7 +49,7 @@
               <thead>Buyers</thead>
               <tbody>
                 <tr v-for="b in bidders" :key="b">
-                  <td>{{ buyers[b-1].name }}</td>
+                  <td>{{ buyers[b].name }}</td>
                   <td class="clickable" @click="deleteBidder(b)">Delete</td>
                 </tr>
               </tbody>
@@ -105,7 +105,7 @@
             <table class="inner_table">
               <thead>Buyers</thead>
               <tr v-for="pBuyer in previousBuyerNumbers" :key="pBuyer">
-                <td>{{ buyers[pBuyer-1].name }}</td>
+                <td>{{ buyers[pBuyer].name }}</td>
               </tr>
               <tr class="previous_table_tail">
                 <td v-if="t.purchaseType == buyer" v-for="t in transactions2" :key="t._id">Purchase Amount: ${{t.purchaseAmount}}</td>
@@ -265,12 +265,11 @@
       async fetchBuyers() {
         let uri = `http://${process.env.HOST_NAME}:8081/buyer`
         this.axios.get(uri).then(response => {
-          this.buyers = response.data
+          response.data.forEach((buyer) => { this.buyers[buyer.bidderNumber] = buyer })
         })
       },
       async fetchAddons() {
         this.addons = []
-        await this.sortBuyers()
 
         let col = 1
         for (let i = 0; i < this.transactions.length; i++) {
@@ -278,7 +277,7 @@
             col = Math.floor(i / 11 + 1)
             this.addons.push({
             _id: this.transactions[i]._id,
-            name: this.buyers[this.transactions[i].bidderNumber - 1].name,
+            name: this.buyers[this.transactions[i].bidderNumber].name,
             purchaseAmount: this.transactions[i].purchaseAmount,
             column: col
             })
@@ -287,7 +286,6 @@
       },
       async fetchPreviousAddons() {
         this.addons2 = []
-        await this.sortBuyers()
 
         let col = 1
         for (let i = 0; i < this.transactions2.length; i++) {
@@ -295,7 +293,7 @@
             col = Math.floor(i / 11 + 1)
             this.addons2.push({
             _id: this.transactions2[i]._id,
-            name: this.buyers[this.transactions2[i].bidderNumber - 1].name,
+            name: this.buyers[this.transactions2[i].bidderNumber].name,
             purchaseAmount: this.transactions2[i].purchaseAmount,
             column: col
             })
@@ -352,6 +350,8 @@
       async addNewBuyerTransaction() {
         if (this.purchaseAmount == 0) {
           window.alert("Purchase amount cannot be 0")
+        } else if (this.bidders.length == 0) {
+          window.alert("Bidders cannot be empty")
         } else {
           // checks how many bidders there are, joins it if there's more than one
           if (this.bidders.length > 1) this.bidders = this.bidders.join('-')
@@ -434,9 +434,6 @@
         }
         // resets input field
         this.bidderNumber = "0"
-      },
-      async sortBuyers() {
-        this.buyers = this.buyers.sort((a, b) => a.bidderNumber - b.bidderNumber)
       },
       async deleteAddon(id) {
         console.log(id)

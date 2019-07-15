@@ -22,7 +22,7 @@
               <table>
                 <tbody>
                   <tr class="buyer_rows" v-for="b in buyerNumbers" :key="b">
-                    <td>{{ buyers[b-1].name }}</td>
+                    <td>{{ buyers[b].name }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -82,7 +82,7 @@
               <table>
                 <tbody>
                   <tr class="buyer_rows" v-for="b in buyerNumbers2" :key="b">
-                    <td>{{ buyers[b-1].name }}</td>
+                    <td>{{ buyers[b].name }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -214,7 +214,7 @@
       async fetchBuyers() {
         let uri = `http://${process.env.HOST_NAME}:8081/buyer`
         this.axios.get(uri).then(response => {
-          this.buyers = response.data
+          response.data.forEach((buyer) => { this.buyers[buyer.bidderNumber] = buyer })
         })
       },
       async sortBuyers() {
@@ -249,7 +249,7 @@
           if (this.transactions[i].purchaseType == "Addon") {
             col = Math.floor(i / 8 + 1)
             this.addons.push({
-            name: this.buyers[this.transactions[i].bidderNumber - 1].name,
+            name: this.buyers[this.transactions[i].bidderNumber].name,
             purchaseAmount: this.transactions[i].purchaseAmount,
             column: col
             })
@@ -260,7 +260,7 @@
           if (this.transactions2[i].purchaseType == "Addon") {
             col = Math.floor(i / 8 + 1)
             this.addons2.push({
-            name: this.buyers[this.transactions2[i].bidderNumber - 1].name,
+            name: this.buyers[this.transactions2[i].bidderNumber].name,
             purchaseAmount: this.transactions2[i].purchaseAmount,
             column: col
             })
