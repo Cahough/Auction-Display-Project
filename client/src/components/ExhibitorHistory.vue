@@ -266,7 +266,7 @@
             })
           }
         }
-    },
+      },
       ...mapActions(['setSaleNumber', 'setTransactions'])
     }
   }
