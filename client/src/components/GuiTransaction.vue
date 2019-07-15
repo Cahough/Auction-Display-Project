@@ -186,7 +186,7 @@
       }
     },
     created: function () {
-      this.fetchData()
+      this.fetchData().then(() => { this.saleNumber = this.display.saleNumber })
     },
     computed: {
       ...mapState({
@@ -202,8 +202,6 @@
         await this.fetchExhibitor()
         this.fetchTransactions() // Then fetches addons and buyerNumbers
         this.fetchPreviousTransactions()
-
-        this.saleNumber = this.display.saleNumber
       },
       async fetchDisplay() {
         let url = `http://${process.env.HOST_NAME}:8081/display`
@@ -396,8 +394,8 @@
               this.addons = []
               this.saleNumber++
               this.fetchPreviousExhibitor()
+              this.fetchData()
             })
-            this.fetchPreviousTransactions()
         }
       },
       async addNewAddonTransaction() {
@@ -413,6 +411,7 @@
           .then((response) => {
             console.log(response)
             this.fetchTransactions()
+            this.fetchPreviousTransactions()
           })
           .then(() => {
             this.addonNumber = 0
