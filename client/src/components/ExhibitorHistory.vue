@@ -185,16 +185,16 @@
         this.fetchTransactions()
       },
       async fetchBuyerNumbers() {
-        let a = 0 // Buyer element of transactions
-        let b = 0 // Buyer element of transactions2
+        let a = -1 // Buyer element of transactions
+        let b = -1 // Buyer element of transactions2
         for (let i = 0; i < this.transactions.length; i++) {
           if (this.transactions[i].purchaseType == "Buyer") a = i
         }
         for (let i = 0; i < this.transactions2.length; i++) {
           if (this.transactions2[i].purchaseType == "Buyer") b = i
         }
-        this.buyerNumbers = this.transactions[a].bidderNumber.split('-').map(Number)
-        if (this.transactions2.length > 0) this.buyerNumbers2 = this.transactions2[b].bidderNumber.split('-').map(Number)
+        if (a > -1) this.buyerNumbers = this.transactions[a].bidderNumber.split('-').map(Number)
+        if (b > -1) this.buyerNumbers2 = this.transactions2[b].bidderNumber.split('-').map(Number)
         else this.buyerNumbers2 = []
       },
       async fetchExhibitor() {
@@ -216,9 +216,6 @@
         this.axios.get(uri).then(response => {
           response.data.forEach((buyer) => { this.buyers[buyer.bidderNumber] = buyer })
         })
-      },
-      async sortBuyers() {
-        this.buyers = this.buyers.sort((a, b) => a.bidderNumber - b.bidderNumber)
       },
       async fetchTransactions() {
         let url = `http://${process.env.HOST_NAME}:8081/transaction/saleNumber/${this.saleNumber}`
@@ -242,7 +239,6 @@
       async fetchAddons() {
         this.addons = []
         this.addons2 = []
-        await this.sortBuyers()
 
         let col = 1
         for (let i = 0; i < this.transactions.length; i++) {
