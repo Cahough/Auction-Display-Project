@@ -1,7 +1,7 @@
 <template>
     <main class="display">
       <!-- CURRENT SALE -->
-      <section class="currentsale" v-if="(previousSaleNumber != saleNumber)">
+      <section class="currentsale" v-if="(exhibitor != null && previousSaleNumber != saleNumber)">
         <h1 class="display__header--white">Current Sale:</h1>
         <p class="display__exhibitor-name">{{exhibitor.fullName}}</p>
         <p class="display__exhibitor-info">Species: {{exhibitor.species}}</p>
@@ -13,7 +13,7 @@
         <p class="display__header--white"><em>Please wait for the next sale</em></p>
       </section>
       <!-- PREVIOUS SALE -->
-      <section class="previoussale" v-if="previousExhibitor">
+      <section class="previoussale" v-if="previousExhibitor != null">
         <!-- EXHIBITOR -->
         <section>
           <h1 class="display__header">Previous Sale</h1>
@@ -40,7 +40,6 @@
             </section>
           </section>
         </section>
-
       </section>
     </main>
 </template>
@@ -126,7 +125,11 @@
           showPreviousSale: this.showPreviousSale
         }
         await this.axios.put(uri, updatedCheck).then(response => { })
-        window.location.reload()
+        // window.location.reload()
+        // Above line changed from previous code, can be removed.. probably
+        this.buyers = []
+        this.addOns = []
+        this.fetchData()
       },
       async fetchExhibitor() {
         // fetches the current exhibitor by its sale number
@@ -159,11 +162,12 @@
         })
       },
       async fetchBuyers() {
-        this.parseBidderNumber()
+        await this.parseBidderNumber()
         for (let i = 0; i < this.bidderNumbers.length; i++) {
           let uri = `http://${process.env.HOST_NAME}:8081/buyer/bidderNumber/${this.bidderNumbers[i]}`
           await this.axios.get(uri).then(response => {
             this.buyers[i] = response.data
+            if (this.buyers.length > this.bidderNumbers.length) this.buyers.length = this.bidderNumbers.length
           })
         }
       },
