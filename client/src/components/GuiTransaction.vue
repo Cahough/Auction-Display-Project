@@ -285,7 +285,7 @@
           }
         }
       },
-      async fetchPreviousAddons() { // TODO: Implement
+      async fetchPreviousAddons() {
         this.addons2 = []
         await this.sortBuyers()
 
@@ -437,9 +437,6 @@
       },
       async sortBuyers() {
         this.buyers = this.buyers.sort((a, b) => a.bidderNumber - b.bidderNumber)
-      },
-      async deleteBuyer(id) { // TODO: implement
-        console.log("Delete Buyer Reached")
       },
       async deleteAddon(id) {
         console.log(id)
