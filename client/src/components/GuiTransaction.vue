@@ -48,7 +48,7 @@
             <table class="inner_table">
               <thead>Buyers</thead>
               <tbody>
-                <tr v-for="b in bidders" :key="b">
+                <tr v-if="buyers != null" v-for="b in bidders" :key="b">
                   <td>{{ buyers[b].name }}</td>
                   <td class="clickable" @click="deleteBidder(b)">Delete</td>
                 </tr>
@@ -104,7 +104,7 @@
           <div class="previous_buyers">
             <table class="inner_table">
               <thead>Buyers</thead>
-              <tr v-for="pBuyer in previousBuyerNumbers" :key="pBuyer">
+              <tr v-if="buyers != null" v-for="pBuyer in previousBuyerNumbers" :key="pBuyer">
                 <td>{{ buyers[pBuyer].name }}</td>
               </tr>
               <tr class="previous_table_tail">
@@ -135,15 +135,6 @@
                   <td class="clickable" @click="deleteAddon(addon._id)">Delete</td>
                 </tr>
               </tbody>
-            </table>
-          </div>
-          <div class="button_holder">
-            <table>
-              <tr>
-                <td>Change View: </td>
-                <td><input class="change_view_input"></td>
-                <td><button class="temp_button2">Submit</button></td>
-              </tr>
             </table>
           </div>
         </div>
@@ -197,7 +188,7 @@
     methods: {
       async fetchData() {
         this.fetchPreviousExhibitor()
-        this.fetchBuyers()
+        await this.fetchBuyers()
         await this.fetchDisplay()
         await this.fetchExhibitor()
         this.fetchTransactions() // Then fetches addons and buyerNumbers
@@ -352,6 +343,8 @@
           window.alert("Purchase amount cannot be 0")
         } else if (this.bidders.length == 0) {
           window.alert("Bidders cannot be empty")
+        } else if (this.previousSaleNumber == this.exhibitor.saleNumber) {
+          window.alert("Submit current buyer")
         } else {
           // checks how many bidders there are, joins it if there's more than one
           if (this.bidders.length > 1) this.bidders = this.bidders.join('-')
@@ -478,6 +471,7 @@
 
 <css>
 .inner_table {
+  padding: 10px;
   text-align: left; }
 
 .warning_label {
