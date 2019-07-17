@@ -125,7 +125,7 @@
         let col = 1
         for (let i = 0; i < this.transactions.length; i++) {
           if (this.transactions[i].purchaseType == "Addon") {
-            col = Math.floor(i / 15 + 1)
+            col = Math.floor(i / 21 + 1)
             this.addons.push({
             _id: this.transactions[i]._id,
             name: this.buyers[this.transactions[i].bidderNumber].name,
