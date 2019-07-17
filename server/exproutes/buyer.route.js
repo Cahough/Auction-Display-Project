@@ -6,7 +6,7 @@ const Buyer = require('../models/buyer.js')
 // Add a buyer
 buyerRoutes.route('/add').post(function (req, res) {
     var buyer = new Buyer(req.body)
-    if (buyer.bidderNumber && buyer.name && buyer.contactName && buyer.phone) {
+    if (buyer.bidderNumber && buyer.name) {
         buyer.save()
         .then(buyer => {
         res.status(200).json({'buyer': 'buyer added successfully'})

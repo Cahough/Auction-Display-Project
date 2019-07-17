@@ -14,11 +14,9 @@ var BuyerSchema = new Schema({
   },
   contactName: {
     type: String,
-    required: true
   },
   phone: {
     type: String,
-    required: true
   },
   email: {
     type: String,
