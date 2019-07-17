@@ -470,6 +470,10 @@
 </script>
 
 <css>
+.alternative_transaction {
+  text-align: center;
+  margin: 10px; }
+
 .inner_table {
   padding: 10px;
   text-align: left; }
@@ -509,10 +513,6 @@
   padding: 10px;
   margin: 10px;
   border: 1px solid green;  }
-
-.alternative_transaction {
-  text-align: center;
-  margin: 10px; }
 
 .current_sale_form {
   border: 1px solid green;
