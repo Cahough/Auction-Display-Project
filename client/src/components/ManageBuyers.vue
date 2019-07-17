@@ -176,7 +176,7 @@
         if (indexLine < 1) return // Jump header line
 
         var obj = {}
-        var currentline = line.split(",")
+        var currentline = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
 
         headers.map(function(header, indexHeader) {
           obj[header] = currentline[indexHeader].replace(/"/g, '').replace(null, '')
@@ -217,11 +217,11 @@
         logoFileName: obj.logoFileName
       }
       let uri = `http://${process.env.HOST_NAME}:8081/buyer/add`
-      this.axios.post(uri, newBuyer).then((response) => {
+      await this.axios.post(uri, newBuyer).then((response) => {
         console.log(response)
       })
       this.fetchBuyers()
-      this.$router.push({ name: 'Manage' })
+      // this.$router.push({ name: 'Manage' })
     },
     sort: function(s) {
       // if s == current sort, reverse
