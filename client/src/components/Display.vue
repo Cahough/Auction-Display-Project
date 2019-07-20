@@ -6,7 +6,7 @@
         <p class="display__exhibitor-name">{{exhibitor.fullName}}</p>
         <p class="display__exhibitor-info">Species: {{exhibitor.species}}</p>
         <p class="display__exhibitor-info">Weight: {{exhibitor.checkInWeight}} lbs</p>
-        <p class="display__exhibitor-info">Club: {{exhibitor.clubName}}</p>
+        <p class="display__exhibitor-info">Placing: {{exhibitor.placing}}</p>
       </section>
       <section class="currentsale" v-else>
         <h1 class="display__header--white">Current Sale:</h1>
