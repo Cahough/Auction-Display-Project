@@ -2,7 +2,7 @@
     <main class="display">
       <!-- CURRENT SALE -->
       <section class="currentsale" v-if="(exhibitor != null && previousSaleNumber != saleNumber)">
-        <h1 class="display__header--white">Current Sale:</h1>
+        <h1 class="display__header--white">Current Sale: #{{exhibitor.saleNumber}}</h1>
         <p class="display__exhibitor-name">{{exhibitor.fullName}}</p>
         <p class="display__exhibitor-info">Species: {{exhibitor.species}}</p>
         <p class="display__exhibitor-info">Weight: {{exhibitor.checkInWeight}} lbs</p>
@@ -16,7 +16,7 @@
       <section class="previoussale" v-if="previousExhibitor != null">
         <!-- EXHIBITOR -->
         <section>
-          <h1 class="display__header">Previous Sale</h1>
+          <h1 class="display__header">Previous Sale: #{{ previousExhibitor.saleNumber }}</h1>
           <p class="display__exhibitor-name">{{ previousExhibitor.fullName }}</p>
           <p class="display__exhibitor-info">Species: {{ previousExhibitor.species }}</p>
           <p class="display__exhibitor-info">Weight: {{ previousExhibitor.checkInWeight }}</p>
@@ -25,7 +25,7 @@
         <section class="buyers">
           <p class="display__second-header">Buyers:</p>
           <section class="buyer" v-if="buyer !== null" v-for="buyer in buyers" :key="buyer._id">
-            {{ buyer.name }}
+            {{ buyer.name }}.
           </section>
           <section class="purchaseAmount" v-if="transaction.purchaseType === buyer" v-for="transaction in transactions" :key="transaction._id">
             Purchase Amount: ${{ transaction.purchaseAmount }}
