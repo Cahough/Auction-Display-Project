@@ -88,7 +88,7 @@
               <tr>
                 <td>Purchase Amount:</td>
                 <td><input  @focus="clearCurrentPurchase" @blur="zeroCurrentPurchase" v-validate="'required|numeric'" type="number" name="purchaseAmount" v-model="purchaseAmount"></td>
-                <td><button class="temp_button" name="addBtn" @click="addNewBuyerTransaction">Submit & Go To Next Sale</button></td>
+                <td><button class="submit_current_button" name="addBtn" @click="addNewBuyerTransaction">Submit & Go To Next Sale</button></td>
               </tr>
             </table>
           </div>
@@ -137,6 +137,7 @@
               </tbody>
             </table>
           </div>
+          <div class="button_holder"></div>
         </div>
       </div>
     </main>
@@ -494,17 +495,11 @@
   color: #fadc23;
   text-decoration: underline; }
 
-.temp_button {
+.submit_current_button {
   background-color: #fadc23;
   color: green;
   margin-bottom: 15px;
   padding: 10px 15px; }
-
-.temp_button2 {
-  color: green;
-  margin-bottom: 15px;
-  padding: 10px 15px;
-  background-color: #f1f1f1; }
 
 .change_view_input {
   border: 1px solid green; }
@@ -517,23 +512,22 @@
 .current_sale_form {
   border: 1px solid green;
   padding: 10px;
-  margin: 20px; }
+  margin-right: 20px; }
 
 .current_sale_view {
   height: 43vh;
-  margin: 20px;
   color: #ffffff;
   background-color: #339966;  }
 
 .previous_sale_view {
   color: #339966;
-  border: 1px solid #339966;
-  margin: 20px; }
+  border: 1px solid #339966;  }
 
 .previous_exhibitor, .current_exhibitor {
   font-size: 30px; }
 
 .grid-container {
+  margin-top: 10px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
@@ -567,7 +561,6 @@
   grid-template-areas: "previous_exhibitor previous_buyers previous_addons previous_addons2" "previous_exhibitor previous_buyers previous_addons previous_addons2" "previous_exhibitor previous_buyers previous_addons previous_addons2" "previous_exhibitor previous_buyers previous_addons previous_addons2" "button_holder button_holder button_holder button_holder";
   grid-area: previous_sale_view;
 }
-
 .previous_exhibitor { grid-area: previous_exhibitor; }
 
 .previous_buyers { grid-area: previous_buyers; }
