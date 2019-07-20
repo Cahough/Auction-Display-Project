@@ -4,13 +4,13 @@
     <div v-if="this.isDataReady">
       <label v-if="duplicateSaleNumber" class="errorLabel" for="saleNumber">Error: Duplicate Sale Number. Sale Number must be unique.</label>
       <label v-else class="errorLabel" for="saleNumber" >{{ errors.first('saleNumber') }}</label>
-      <input v-validate="'required|numeric'" type="text" name="saleNumber" :placeholder="'Sale Number (next available: ' + nextAvailableSaleNumber + ')'" v-model="saleNumber" autocomplete="off">
+      <input v-validate="'required|numeric'" type="text" name="saleNumber" :placeholder="'Sale Number* (next available: ' + nextAvailableSaleNumber + ')'" v-model="saleNumber" autocomplete="off">
       <label class="errorLabel" for="fullName" >{{ errors.first('fullName') }}</label>
-      <input v-validate="'required|alpha_spaces'" type="text" name="fullName" placeholder="Full Name" v-model=fullName autocomplete="off">
+      <input v-validate="'required|alpha_spaces'" type="text" name="fullName" placeholder="Full Name*" v-model=fullName autocomplete="off">
       <label class="errorLabel" for="species" >{{ errors.first('species') }}</label>
-      <input v-validate="'required|alpha_spaces'" type="text" name="species" placeholder="Species" v-model="species" autocomplete="off">
+      <input v-validate="'required|alpha_spaces'" type="text" name="species" placeholder="Species*" v-model="species" autocomplete="off">
       <label class="errorLabel" for="checkInWeight" >{{ errors.first('checkInWeight') }}</label>
-      <input v-validate="'required|decimal'" type="text" name="checkInWeight" placeholder="Check-In Weight" v-model=checkInWeight autocomplete="off">
+      <input v-validate="'required|decimal'" type="text" name="checkInWeight" placeholder="Check-In Weight*" v-model=checkInWeight autocomplete="off">
       <label class="errorLabel" for="tag" >{{ errors.first('tag') }}</label>
       <input v-validate="''" type="text" name="tag" placeholder="Tag" v-model="tag" autocomplete="off">
       <label class="errorLabel" for="animalDescription" >{{ errors.first('animalDescription') }}</label>
@@ -28,6 +28,7 @@
       <router-link v-bind:to="{ name: 'Manage', params: {view: true } }">
         <button class="manage__button">Return to Manage</button>
       </router-link>
+      <p>* Indicates required field.</p>
     </div>
   </main>
 </template>
