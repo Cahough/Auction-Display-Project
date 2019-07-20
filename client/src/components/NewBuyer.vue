@@ -4,13 +4,13 @@
       <div v-if="this.isDataReady">
         <label v-if="duplicateBidderNumber" class="errorLabel" for="bidderNumber">Error: Duplicate Bidder Number. Bidder Number must be unique.</label>
         <label v-else class="errorLabel" for="bidderNumber" >{{ errors.first('bidderNumber') }}</label>
-        <input v-validate="'required|numeric'" type=text name=bidderNumber :placeholder="'Bidder Number (next available: ' + nextAvailableBidderNumber + ')'" v-model=bidderNumber autocomplete="off">
+        <input v-validate="'required|numeric'" type=text name=bidderNumber :placeholder="'Bidder Number* (next available: ' + nextAvailableBidderNumber + ')'" v-model=bidderNumber autocomplete="off">
         <label class="errorLabel" for="name" >{{ errors.first('name') }}</label>
-        <input v-validate="'required'" type=text name=name placeholder="Name" v-model=name autocomplete="off">
-        <label class="errorLabel" for="contactName" >{{ errors.first('contactName') }}</label>
-        <input v-validate="'required|alpha_spaces'" type=text name=contactName placeholder="Contact Name" v-model=contactName autocomplete="off">
+        <input v-validate="'required'" type=text name=name placeholder="Name*" v-model=name autocomplete="off">
         <label class="errorLabel" for="phone" >{{ errors.first('phone') }}</label>
-        <cleave v-validate="'required|digits:10'" v-model="phone" :options="options" name="phone" placeholder="Phone (555-555-5555)"></cleave>
+        <cleave v-validate="'required|digits:10'" v-model="phone" :options="options" name="phone" placeholder="Phone* (555-555-5555)"></cleave>
+        <label class="errorLabel" for="contactName" >{{ errors.first('contactName') }}</label>
+        <input v-validate="'alpha_spaces'" type=text name=contactName placeholder="Contact Name" v-model=contactName autocomplete="off">
         <label class="errorLabel" for="email" >{{ errors.first('email') }}</label>
         <input v-validate="'email'" data-vv-as="email" type=text name=email placeholder="Email" v-model=email autocomplete="off">
         <label class="errorLabel" for="logoFileName" >{{ errors.first('logoFileName') }}</label>
@@ -20,6 +20,7 @@
         <router-link v-bind:to="{ name: 'Manage', params: {view: false} }">
           <button class="manage__button">Return to Manage</button>
         </router-link>
+        <p>* Indicates required field.</p>
       </div>
   </main>
 </template>
