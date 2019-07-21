@@ -345,7 +345,7 @@
         } else if (this.bidders.length == 0) {
           window.alert("Bidders cannot be empty")
         } else if (this.previousSaleNumber == this.exhibitor.saleNumber) {
-          window.alert("Submit current buyer")
+          window.alert("Sumbit exhibitor to current sale")
         } else {
           // checks how many bidders there are, joins it if there's more than one
           if (this.bidders.length > 1) this.bidders = this.bidders.join('-')
@@ -393,7 +393,7 @@
         }
       },
       async addNewAddonTransaction() {
-        if (this.addonNumber != 0) {
+        if (this.addonNumber != 0 && this.buyers[this.addonNumber] != null) {
           let newTransaction = {
             saleNumber: this.saleNumber,
             bidderNumber: this.addonNumber,
@@ -412,7 +412,7 @@
             this.addonPurchaseAmount = 0
           })
         } else {
-          window.alert("Addon number cannot be 0")
+          window.alert("Addon number cannot be null")
         }
       },
       async addNewBidder() {

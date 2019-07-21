@@ -194,7 +194,7 @@
         this.fetchTransactions()
       },
       async addNewTransaction () {
-        if (this.addonNumber != 0) {
+        if (this.addonNumber != 0 && this.buyers[this.addonNumber] != null) {
           let newTransaction = {
             saleNumber: this.saleNumber,
             bidderNumber: this.addonNumber,
@@ -212,7 +212,7 @@
             this.purchaseAmount = 0
           })
         } else {
-          window.alert("Addon number cannot be 0")
+          window.alert("Addon number cannot be null")
         }
       },
       clearSaleNumber () {
